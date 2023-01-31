@@ -1,9 +1,14 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
+import { createTrace } from "./trace";
 
 function App() {
   const [list, setList] = useState([]);
+
+  useEffect(() => {
+    createTrace();
+  }, []);
 
   const trap = () => {
     axios
@@ -22,7 +27,7 @@ function App() {
       {list.length > 0 && (
         <div className="flex">
           {list.map((item, key) => (
-            <div id={key}>
+            <div key={key}>
               <img
                 className="logo"
                 src={item?.sprites?.front_default}
