@@ -69,10 +69,15 @@ export const createTrace = () => {
       new XMLHttpRequestInstrumentation({
         applyCustomAttributesOnSpan(span, xhr) {
           if (xhr.status === 200) {
-            span.setAttribute("custom", "Es un test");
+            span.setAttribute("response", '{}');
+          }
+          if (xhr.status === 500) {
+            span.setAttribute("error", true);
           }
         },
       }),
     ],
   });
+
+  return provider
 };

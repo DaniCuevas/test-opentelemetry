@@ -1,24 +1,29 @@
+import { context, trace } from "@opentelemetry/api";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import { createTrace } from "./trace";
 
 function App() {
   const [list, setList] = useState([]);
 
-  useEffect(() => {
-    createTrace();
-  }, []);
-
   const trap = () => {
-    axios
-      .get("https://pokeapi.co/api/v2/pokemon/pikachu")
-      .then((response) => {
-        setList([...list, response.data]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    const traceProvider = createTrace();
+    const traza = traceProvider.getTracer('poke-traza')
+    const span1 = traza.startSpan(`poke-span`);
+    context.with(trace.setSpan(context.active(), span1), () => {
+      axios
+        .get("https://pokeapi.co/api/v2/pokemon/pikachu")
+        .then((response) => {
+          setList([...list, response.data]);
+          span1.addEvent('poke-completed');
+          span1.end();
+        })
+        .catch((error) => {
+          console.log(error);
+          span1.end();
+        });
+    });
   };
 
   return (
